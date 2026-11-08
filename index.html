@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lanternway — An offscreen RPG</title>
-<meta name="description" content="An offscreen study RPG. Your focus sends Wren into the fog. Every completed study session opens the map, a chapter, and something new at camp.">
+<meta name="description" content="An offscreen study RPG. Put the phone down to study — research links phone multitasking to weaker recall. Your focus sends Wren into the fog.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,560&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
@@ -313,7 +313,7 @@
   .wren img:first-child { position: relative; }
   .wren .flame { animation: flicker 2.6s ease-in-out infinite; }
 
-  .trail, .islands, .rules, .gate, footer { position: relative; z-index: 2; }
+  .trail, .islands, .rules, .why, .gate, footer { position: relative; z-index: 2; }
   .trail { padding: 7rem 8vw 0; }
   .surfaces {
     max-width: 40rem;
@@ -394,6 +394,62 @@
     color: var(--mist);
   }
 
+  .why {
+    max-width: 40rem;
+    margin: 0;
+    padding: 4.5rem 8vw 0;
+  }
+  .why .kicker { margin: 0 0 0.55rem; }
+  .why h2 {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.85rem, 2.6vw, 2.4rem);
+    letter-spacing: -0.03em;
+  }
+  .why > p {
+    margin: 0.85rem 0 0;
+    color: var(--mist);
+    max-width: 34rem;
+  }
+  .why ul {
+    margin: 1.35rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+  }
+  .why li {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(1.2rem, 1.7vw, 1.45rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--parchment);
+  }
+  .why li span {
+    display: block;
+    margin-top: 0.2rem;
+    font-family: var(--round);
+    font-size: 0.95rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--mist);
+  }
+  .why .sources {
+    margin: 1.4rem 0 0;
+    font-size: 0.82rem;
+    color: var(--mist);
+    line-height: 1.55;
+  }
+  .why .sources a {
+    color: var(--mist);
+    text-decoration: underline;
+    text-decoration-color: rgba(174, 183, 204, 0.35);
+    text-underline-offset: 0.18em;
+  }
+  .why .sources a:hover { color: var(--parchment); }
+
   .gate {
     max-width: 28rem;
     margin: 5.5rem 8vw 2rem;
@@ -451,6 +507,7 @@
     .islands { grid-template-columns: 1fr 1fr; padding: 2.5rem 1.25rem 0; }
     .rules { padding: 3rem 1.25rem 0; }
     .rules ol { grid-template-columns: 1fr; }
+    .why { padding: 3rem 1.25rem 0; }
     .gate { margin: 3rem 1.25rem 1.5rem; }
     footer { padding: 0 1.25rem 2.5rem; }
   }
@@ -607,6 +664,24 @@
       <li>Emergencies are free.<span>Leaving for a real reason never breaks the streak and never costs anything.</span></li>
       <li>Focus cannot be bought.<span>No purchase grants minutes, fog, or a longer streak. Clothes for Wren are just clothes.</span></li>
     </ol>
+  </section>
+
+  <section class="why" id="why" aria-labelledby="why-title">
+    <p class="kicker">Why the phone goes down</p>
+    <h2 id="why-title">Attention is expensive to split.</h2>
+    <p>Lanternway is not a clinical product. It follows a simple finding from learning research: when the phone keeps pulling you away, studying gets shallower.</p>
+    <ul>
+      <li>A few minutes, then a switch.<span>In home study sessions, students often stayed on task for under six minutes before social apps or texts took over.</span></li>
+      <li>Multitasking costs recall.<span>Phone distraction during learning is linked to weaker immediate memory and lower academic performance — especially when it happens in class.</span></li>
+      <li>So the journey asks for the screen to wait.<span>You put the phone down. Wren walks. You come back for a minute of story — not another feed.</span></li>
+    </ul>
+    <p class="sources">
+      Drawn from peer-reviewed work on media multitasking and study distraction —
+      <a href="https://doi.org/10.1016/j.chb.2012.12.001">Rosen et al., 2013</a>;
+      <a href="https://doi.org/10.1186/s41239-018-0096-z">May &amp; Elder, 2018</a>;
+      <a href="https://doi.org/10.1016/j.chb.2024.108432">Chen et al., 2024</a>.
+      Not a claim that Lanternway raises grades.
+    </p>
   </section>
 
   <section class="gate" id="gate" aria-labelledby="gate-title">
