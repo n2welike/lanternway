@@ -315,10 +315,32 @@
 
   .trail, .islands, .picks, .rules, .why, .gate, footer { position: relative; z-index: 2; }
   .trail { padding: 7rem 8vw 0; }
-  .surfaces {
-    max-width: 40rem;
-    margin: 0.5rem 0 0;
+  .act {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    margin: 0 0 1.35rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     color: var(--mist);
+  }
+  .act b {
+    color: var(--lantern);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+  }
+  .floor {
+    height: 1px;
+    margin: 0 8vw;
+    border: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 181, 71, 0.28) 18%,
+      rgba(174, 183, 204, 0.18) 50%,
+      transparent 100%
+    );
   }
   .card {
     display: grid;
@@ -352,8 +374,9 @@
     grid-template-columns: repeat(5, 1fr);
     gap: 1.5rem 1.25rem;
     margin: 0;
-    padding: 1.5rem 6vw 0;
+    padding: 5rem 6vw 0;
   }
+  .islands .act { grid-column: 1 / -1; margin-bottom: 0.85rem; }
   .islands .record {
     grid-column: 1 / -1;
     max-width: 18em;
@@ -369,7 +392,8 @@
   .islands h3 { font-family: var(--serif); font-weight: 500; margin: 0.55rem 0 0; font-size: 1.15rem; }
   .islands p { margin: 0.3rem 0 0; color: var(--mist); font-size: 0.95rem; }
 
-  .picks, .rules { margin: 0; padding: 4.5rem 8vw 0; }
+  .picks { margin: 0; padding: 4.75rem 8vw 0; }
+  .rules { margin: 0; padding: 3.25rem 8vw 0; }
   .picks ul, .rules ol {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -381,9 +405,16 @@
     list-style: none;
     margin: 0;
     font-family: var(--serif);
-    font-size: clamp(1.55rem, 2.2vw, 2rem);
     font-weight: 500;
     letter-spacing: -0.03em;
+  }
+  .picks li {
+    font-size: clamp(1.55rem, 2.2vw, 2rem);
+    color: var(--parchment);
+  }
+  .rules li {
+    font-size: clamp(1.4rem, 2vw, 1.8rem);
+    color: color-mix(in srgb, var(--parchment) 88%, var(--mist));
   }
   .picks li span, .rules li span {
     display: block;
@@ -394,53 +425,56 @@
     color: var(--mist);
   }
 
-  .why { margin: 0; padding: 4.5rem 8vw 0; }
+  /* Evidence sits quieter than Keep / Promise — proof, not another manifesto. */
+  .why {
+    margin: 2.75rem 8vw 0;
+    padding: 1.75rem 0 0;
+    border-top: 1px solid rgba(174, 183, 204, 0.16);
+  }
   .why .lead {
-    margin: 0 0 1.6rem;
-    max-width: 28rem;
+    margin: 0 0 1.1rem;
+    max-width: 26rem;
+    font-family: var(--round);
+    font-size: 0.95rem;
+    color: var(--mist);
+  }
+  .why .lead strong {
+    display: block;
+    margin-bottom: 0.2rem;
     font-family: var(--serif);
     font-weight: 500;
-    font-size: clamp(1.55rem, 2.2vw, 2rem);
-    letter-spacing: -0.03em;
-  }
-  .why .lead span {
-    display: block;
-    margin-top: 0.25rem;
-    font-family: var(--round);
-    font-size: 1rem;
-    font-weight: 400;
-    letter-spacing: 0;
-    color: var(--mist);
+    font-size: clamp(1.15rem, 1.5vw, 1.35rem);
+    letter-spacing: -0.02em;
+    color: var(--parchment);
   }
   .why ul {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem 2.5rem;
+    gap: 1.4rem 2rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
   .why li {
     margin: 0;
-    font-family: var(--serif);
-    font-size: clamp(1.35rem, 1.9vw, 1.7rem);
-    font-weight: 500;
-    letter-spacing: -0.03em;
+    font-family: var(--round);
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--mist);
   }
   .why li span {
     display: block;
-    margin-top: 0.25rem;
-    font-family: var(--round);
-    font-size: 1rem;
+    margin-top: 0.2rem;
     font-weight: 400;
-    letter-spacing: 0;
-    color: var(--mist);
+    font-size: 0.92rem;
+    color: color-mix(in srgb, var(--mist) 88%, transparent);
   }
   .why .sources {
-    margin: 1.5rem 0 0;
-    font-size: 0.82rem;
+    margin: 1.15rem 0 0;
+    font-size: 0.78rem;
     color: var(--mist);
     line-height: 1.5;
+    opacity: 0.9;
   }
   .why .sources a {
     color: var(--mist);
@@ -452,7 +486,7 @@
 
   .gate {
     max-width: 28rem;
-    margin: 5.5rem 8vw 2rem;
+    margin: 5rem 8vw 2rem;
     padding: 0;
     background: none;
   }
@@ -504,10 +538,12 @@
     .camp { left: 62%; bottom: -8%; width: 72vw; }
     .trail { padding: 3.5rem 1.25rem 0; }
     .card { grid-template-columns: 1fr; gap: 0.35rem; }
-    .islands { grid-template-columns: 1fr 1fr; padding: 2.5rem 1.25rem 0; }
-    .picks, .rules { padding: 3rem 1.25rem 0; }
+    .islands { grid-template-columns: 1fr 1fr; padding: 3rem 1.25rem 0; }
+    .floor { margin: 0 1.25rem; }
+    .picks { padding: 3.25rem 1.25rem 0; }
+    .rules { padding: 2.5rem 1.25rem 0; }
     .picks ul, .rules ol { grid-template-columns: 1fr; }
-    .why { padding: 3rem 1.25rem 0; }
+    .why { margin: 2.25rem 1.25rem 0; padding-top: 1.4rem; }
     .why ul { grid-template-columns: 1fr; }
     .gate { margin: 3rem 1.25rem 1.5rem; }
     footer { padding: 0 1.25rem 2.5rem; }
@@ -596,6 +632,7 @@
   </section>
 
   <section class="trail" id="trail">
+    <p class="act"><b>01</b> A session</p>
     <article class="card">
       <div>
         <p class="kicker">01</p>
@@ -619,7 +656,10 @@
     </article>
   </section>
 
+  <hr class="floor" aria-hidden="true">
+
   <section class="islands" aria-label="Subjects">
+    <p class="act"><b>02</b> The world</p>
     <p class="record">Five islands. The one you study is the one that stays lit.</p>
     <article id="peaks">
       <img src="art/region-peaks.png" alt="">
@@ -658,7 +698,10 @@
     </article>
   </section>
 
+  <hr class="floor" aria-hidden="true">
+
   <section class="picks" aria-label="What stays with you">
+    <p class="act"><b>03</b> Keep</p>
     <ul>
       <li>The Lock Screen keeps walking.<span>Live Activity, Dynamic Island, and the camp widget show the journey without opening the app.</span></li>
       <li>The map is your study record.<span>Fog lifts only where you actually studied. Five islands — math, science, languages, humanities, and the rest.</span></li>
@@ -667,6 +710,7 @@
   </section>
 
   <section class="rules" aria-label="The rules of the camp">
+    <p class="act"><b>04</b> Promise</p>
     <ol>
       <li>The past stays lit.<span>A broken session costs that session. Hours you already walked remain on the map.</span></li>
       <li>Emergencies are free.<span>Leaving for a real reason never breaks the streak and never costs anything.</span></li>
@@ -675,7 +719,8 @@
   </section>
 
   <section class="why" id="why" aria-labelledby="why-title">
-    <p class="lead" id="why-title">Why the phone goes down<span>Learning research, not a clinical claim: splitting attention while studying makes the work shallower.</span></p>
+    <p class="act"><b>05</b> Evidence</p>
+    <p class="lead" id="why-title"><strong>Why the phone goes down</strong>Learning research, not a clinical claim: splitting attention while studying makes the work shallower.</p>
     <ul>
       <li>A few minutes, then a switch.<span>Students often stayed on task under six minutes before social apps or texts took over.</span></li>
       <li>Multitasking costs recall.<span>Phone distraction is linked to weaker memory — and worse grades when it happens in class.</span></li>
@@ -689,8 +734,10 @@
     </p>
   </section>
 
+  <hr class="floor" aria-hidden="true">
+
   <section class="gate" id="gate" aria-labelledby="gate-title">
-    <p class="kicker">The camp gate</p>
+    <p class="act"><b>06</b> Gate</p>
     <h2 id="gate-title">Not in the App Store yet.</h2>
     <p>Leave an email if you want to hear when the first walk opens. This page does not save it.</p>
     <form id="light">
