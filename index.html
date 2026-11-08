@@ -447,30 +447,45 @@
     letter-spacing: -0.02em;
     color: var(--parchment);
   }
-  .why ul {
+  .why .findings {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.4rem 2rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 3rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .why li {
+  .why .findings li {
     margin: 0;
-    font-family: var(--round);
-    font-size: 0.98rem;
-    font-weight: 600;
-    color: var(--mist);
+    padding: 0 0 0 1rem;
+    border-left: 1px solid rgba(255, 181, 71, 0.35);
   }
-  .why li span {
-    display: block;
-    margin-top: 0.2rem;
-    font-weight: 400;
-    font-size: 0.92rem;
-    color: color-mix(in srgb, var(--mist) 88%, transparent);
+  .why .findings .mark {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.55rem, 2.4vw, 2.05rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--lantern);
+  }
+  .why .findings p {
+    margin: 0.45rem 0 0;
+    font-size: 0.95rem;
+    color: var(--mist);
+    max-width: 22rem;
+  }
+  .why .bridge {
+    margin: 1.35rem 0 0;
+    max-width: 28rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.15rem, 1.6vw, 1.35rem);
+    letter-spacing: -0.02em;
+    color: var(--parchment);
   }
   .why .sources {
-    margin: 1.15rem 0 0;
+    margin: 1rem 0 0;
     font-size: 0.78rem;
     color: var(--mist);
     line-height: 1.5;
@@ -544,7 +559,7 @@
     .rules { padding: 2.5rem 1.25rem 0; }
     .picks ul, .rules ol { grid-template-columns: 1fr; }
     .why { margin: 2.25rem 1.25rem 0; padding-top: 1.4rem; }
-    .why ul { grid-template-columns: 1fr; }
+    .why .findings { grid-template-columns: 1fr; gap: 1.15rem; }
     .gate { margin: 3rem 1.25rem 1.5rem; }
     footer { padding: 0 1.25rem 2.5rem; }
   }
@@ -721,11 +736,17 @@
   <section class="why" id="why" aria-labelledby="why-title">
     <p class="act"><b>05</b> Evidence</p>
     <p class="lead" id="why-title"><strong>Why the phone goes down</strong>Learning research, not a clinical claim: splitting attention while studying makes the work shallower.</p>
-    <ul>
-      <li>A few minutes, then a switch.<span>Students often stayed on task under six minutes before social apps or texts took over.</span></li>
-      <li>Multitasking costs recall.<span>Phone distraction is linked to weaker memory — and worse grades when it happens in class.</span></li>
-      <li>So the screen waits.<span>Phone down. Wren walks. You come back for a minute of story, not another feed.</span></li>
+    <ul class="findings">
+      <li>
+        <p class="mark">Under 6 minutes</p>
+        <p>How long students often stayed on task at home before social apps or texts took over.</p>
+      </li>
+      <li>
+        <p class="mark">Weaker recall</p>
+        <p>Phone distraction while learning is linked to shallower memory — and worse grades in class.</p>
+      </li>
     </ul>
+    <p class="bridge">So the screen waits. Phone down. Wren walks. You come back for a minute of story, not another feed.</p>
     <p class="sources">
       <a href="https://doi.org/10.1016/j.chb.2012.12.001">Rosen et al., 2013</a> ·
       <a href="https://doi.org/10.1186/s41239-018-0096-z">May &amp; Elder, 2018</a> ·
