@@ -313,7 +313,7 @@
   .wren img:first-child { position: relative; }
   .wren .flame { animation: flicker 2.6s ease-in-out infinite; }
 
-  .trail, .islands, .rules, .why, .gate, footer { position: relative; z-index: 2; }
+  .trail, .islands, .picks, .rules, .why, .gate, footer { position: relative; z-index: 2; }
   .trail { padding: 7rem 8vw 0; }
   .surfaces {
     max-width: 40rem;
@@ -369,15 +369,15 @@
   .islands h3 { font-family: var(--serif); font-weight: 500; margin: 0.55rem 0 0; font-size: 1.15rem; }
   .islands p { margin: 0.3rem 0 0; color: var(--mist); font-size: 0.95rem; }
 
-  .rules { margin: 0; padding: 4.5rem 8vw 0; }
-  .rules ol {
+  .picks, .rules { margin: 0; padding: 4.5rem 8vw 0; }
+  .picks ul, .rules ol {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem 2.5rem;
     margin: 0;
     padding: 0;
   }
-  .rules li {
+  .picks li, .rules li {
     list-style: none;
     margin: 0;
     font-family: var(--serif);
@@ -385,7 +385,7 @@
     font-weight: 500;
     letter-spacing: -0.03em;
   }
-  .rules li span {
+  .picks li span, .rules li span {
     display: block;
     margin-top: 0.25rem;
     font-family: var(--round);
@@ -505,8 +505,8 @@
     .trail { padding: 3.5rem 1.25rem 0; }
     .card { grid-template-columns: 1fr; gap: 0.35rem; }
     .islands { grid-template-columns: 1fr 1fr; padding: 2.5rem 1.25rem 0; }
-    .rules { padding: 3rem 1.25rem 0; }
-    .rules ol { grid-template-columns: 1fr; }
+    .picks, .rules { padding: 3rem 1.25rem 0; }
+    .picks ul, .rules ol { grid-template-columns: 1fr; }
     .why { padding: 3rem 1.25rem 0; }
     .why ul { grid-template-columns: 1fr; }
     .gate { margin: 3rem 1.25rem 1.5rem; }
@@ -617,7 +617,6 @@
       </div>
       <p>You read the chapter this session opened. Thirty chapters open by studying, not by paying. About a minute. <em>Nothing else to do in the app.</em></p>
     </article>
-    <p class="surfaces">The same hours show on the Lock Screen, the camp widget, and the week chart.</p>
   </section>
 
   <section class="islands" aria-label="Subjects">
@@ -657,6 +656,14 @@
         <p>Everything else. Art, music, reading, or a project with no other island.</p>
       </div>
     </article>
+  </section>
+
+  <section class="picks" aria-label="What stays with you">
+    <ul>
+      <li>The Lock Screen keeps walking.<span>Live Activity, Dynamic Island, and the camp widget show the journey without opening the app.</span></li>
+      <li>The map is your study record.<span>Fog lifts only where you actually studied. Five islands — math, science, languages, humanities, and the rest.</span></li>
+      <li>Wren grows with the hours.<span>Chapters and camp gear unlock by studying. Clothes never buy more focus.</span></li>
+    </ul>
   </section>
 
   <section class="rules" aria-label="The rules of the camp">
