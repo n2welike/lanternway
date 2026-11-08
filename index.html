@@ -313,7 +313,7 @@
   .wren img:first-child { position: relative; }
   .wren .flame { animation: flicker 2.6s ease-in-out infinite; }
 
-  .trail, .islands, .picks, .rules, .why, .gate, footer { position: relative; z-index: 2; }
+  .trail, .islands, .picks, .rules, .why, .trust, .gate, footer { position: relative; z-index: 2; }
   .trail { padding: 7rem 8vw 0; }
   .act {
     display: flex;
@@ -499,6 +499,48 @@
   }
   .why .sources a:hover { color: var(--parchment); }
 
+  /* Trust: one quiet strip before the gate — readable, not another manifesto floor. */
+  .trust {
+    margin: 0 8vw 0;
+    padding: 0 0 0.25rem;
+    max-width: 52rem;
+  }
+  .trust ul {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .trust li {
+    margin: 0;
+    font-size: 0.98rem;
+    color: var(--mist);
+    line-height: 1.45;
+  }
+  .trust li strong {
+    display: block;
+    margin-bottom: 0.15rem;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.15rem, 1.5vw, 1.35rem);
+    letter-spacing: -0.02em;
+    color: var(--parchment);
+  }
+  .trust .more {
+    margin: 1rem 0 0;
+    font-size: 0.82rem;
+    color: var(--mist);
+  }
+  .trust .more a {
+    color: var(--mist);
+    text-decoration: underline;
+    text-decoration-color: rgba(174, 183, 204, 0.35);
+    text-underline-offset: 0.18em;
+  }
+  .trust .more a:hover { color: var(--parchment); }
+
   .gate {
     max-width: 28rem;
     margin: 0.75rem 8vw 2rem;
@@ -560,6 +602,8 @@
     .picks ul, .rules ol { grid-template-columns: 1fr; }
     .why { margin: 2.5rem 1.25rem 0; padding-top: 2.25rem; }
     .why .findings { grid-template-columns: 1fr; gap: 1.15rem; }
+    .trust { margin: 0 1.25rem; }
+    .trust ul { grid-template-columns: 1fr; gap: 1rem; }
     .gate { margin: 0.5rem 1.25rem 1.5rem; }
     footer { padding: 0 1.25rem 2.5rem; }
   }
@@ -757,10 +801,20 @@
 
   <hr class="floor" aria-hidden="true">
 
+  <section class="trust" id="trust" aria-label="Trust">
+    <p class="act"><b>06</b> Trust</p>
+    <ul>
+      <li><strong>On your phone.</strong> Journeys and the map stay on the device — we don't run a server of your study life.</li>
+      <li><strong>Apps stay opaque.</strong> Screen Time never tells us which apps you darkened.</li>
+      <li><strong>You send the week.</strong> Nothing reports to a parent in the background.</li>
+    </ul>
+    <p class="more"><a href="privacy/">Privacy</a> · Delete my data lives in Settings</p>
+  </section>
+
   <section class="gate" id="gate" aria-labelledby="gate-title">
-    <p class="act"><b>06</b> Gate</p>
-    <h2 id="gate-title">Not in the App Store yet.</h2>
-    <p>Leave an email if you want to hear when the first walk opens. This page does not save it.</p>
+    <p class="act"><b>07</b> Gate</p>
+    <h2 id="gate-title">A few days from the App Store.</h2>
+    <p>Leave an email if you want the download link the hour it opens. This page does not save it.</p>
     <form id="light">
       <label for="email">Email</label>
       <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
