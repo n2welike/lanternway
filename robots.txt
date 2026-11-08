@@ -1,0 +1,21 @@
+# Promo home may be indexed. Privacy and support stay out of search via meta noindex.
+User-agent: *
+Allow: /$
+Allow: /index.html
+Disallow: /privacy/
+Disallow: /support/
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /

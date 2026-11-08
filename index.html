@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lanternway — An offscreen RPG</title>
+<meta name="description" content="An offscreen study RPG. Your focus sends Wren into the fog. Every completed study session opens the map, a chapter, and something new at camp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,560&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #0b101c;
+    --dusk: #1b2236;
+    --lantern: #ffb547;
+    --ember: #ff6b3d;
+    --mist: #aeb7cc;
+    --parchment: #f6efe2;
+    --peaks: #5b6787;
+    --forest: #2f6b4f;
+    --coast: #2f6e8a;
+    --plains: #8a7a4a;
+    --hollow: #5e4b7a;
+    --serif: Fraunces, "Iowan Old Style", Palatino, Georgia, serif;
+    --round: Nunito, ui-rounded, "Avenir Next", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background-color: var(--night);
+    background-image: radial-gradient(ellipse 95% 70% at 72% 82%, rgba(26, 36, 56, 0.85), transparent 74%);
+    color: var(--parchment);
+    font-family: var(--round);
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--lantern); outline-offset: 3px; }
+
+  .skip {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    background: var(--lantern);
+    color: var(--night);
+    padding: 0.5rem 1rem;
+    z-index: 20;
+  }
+  .skip:focus { top: 1rem; }
+
+  .stars, .wisps, .lantern-light, .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
+  .stars {
+    z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, rgba(246, 239, 226, 0.75) 50%, transparent 51%),
+      radial-gradient(1px 1px at 28% 72%, rgba(246, 239, 226, 0.4) 50%, transparent 51%),
+      radial-gradient(1.4px 1.4px at 64% 22%, rgba(255, 181, 71, 0.75) 50%, transparent 51%),
+      radial-gradient(1px 1px at 80% 60%, rgba(246, 239, 226, 0.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90% 14%, rgba(246, 239, 226, 0.55) 50%, transparent 51%),
+      radial-gradient(1px 1px at 40% 8%, rgba(246, 239, 226, 0.35) 50%, transparent 51%);
+    animation: twinkle 7s ease-in-out infinite;
+  }
+  .wisps { z-index: 1; overflow: hidden; }
+  .wisps i {
+    position: absolute;
+    width: 46vw;
+    height: 22vh;
+    border-radius: 50%;
+    background: rgba(174, 183, 204, 0.09);
+    filter: blur(36px);
+    animation: drift 32s ease-in-out infinite alternate;
+  }
+  .wisps i:nth-child(1) { top: 8%; left: -10%; }
+  .wisps i:nth-child(2) { top: 38%; left: 40%; animation-duration: 41s; animation-delay: -8s; }
+  .wisps i:nth-child(3) { top: 62%; left: 10%; width: 60vw; animation-duration: 36s; animation-delay: -14s; }
+  .lantern-light {
+    z-index: 7;
+    background: radial-gradient(240px circle at var(--lx, 70vw) var(--ly, 70vh),
+      rgba(255, 181, 71, 0.16) 0%,
+      transparent 72%);
+    mix-blend-mode: screen;
+  }
+  .grain { display: none; }
+
+  .map {
+    position: relative;
+    z-index: 2;
+    height: 100svh;
+    min-height: 700px;
+    margin: 0;
+    overflow: hidden;
+  }
+  .legend {
+    position: absolute;
+    z-index: 5;
+    top: 1.35rem;
+    left: 6vw;
+    font-family: var(--serif);
+  }
+  .legend strong { font-weight: 560; letter-spacing: -0.02em; }
+
+  .motto {
+    position: absolute;
+    z-index: 5;
+    left: 6vw;
+    top: 18vh;
+    margin: 0;
+    text-align: left;
+  }
+  .motto p {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 560;
+    font-size: clamp(2.8rem, 4.2vw, 4.4rem);
+    max-width: 8.6em;
+    letter-spacing: -0.035em;
+    line-height: 0.88;
+  }
+  .motto p span {
+    display: block;
+    max-width: 34ch;
+    margin-top: 1.1rem;
+    font-family: var(--round);
+    font-size: 1.05rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.45;
+    color: var(--mist);
+  }
+  .motto .eyebrow {
+    max-width: none;
+    margin: 0 0 0.85rem;
+    font-family: var(--round);
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+  .walk {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 1.3rem;
+    color: var(--parchment);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(246, 239, 226, 0.4);
+  }
+
+  .sky {
+    position: absolute;
+    inset: -18% -12% -28%;
+    background: url("art/map-background.jpg") 62% 46% / 150% auto no-repeat;
+    opacity: 0.7;
+    mask-image: radial-gradient(ellipse 68% 58% at 66% 40%, #000 8%, transparent 72%);
+    -webkit-mask-image: radial-gradient(ellipse 68% 58% at 66% 40%, #000 8%, transparent 72%);
+  }
+  .flies { position: absolute; inset: 0; pointer-events: none; }
+  .flies i {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--lantern);
+    box-shadow: 0 0 8px 2px rgba(255, 181, 71, 0.8);
+    offset-path: ellipse(90px 34px at 74% 78%);
+    animation: fly 11s linear infinite;
+    opacity: 0.8;
+  }
+  .flies i:nth-child(2) { animation-duration: 15s; animation-delay: -3s; offset-path: ellipse(140px 46px at 72% 74%); }
+  .flies i:nth-child(3) { animation-duration: 18s; animation-delay: -7s; offset-path: ellipse(50px 18px at 70% 70%); }
+  .flies i:nth-child(4) { animation-duration: 13s; animation-delay: -5s; offset-path: ellipse(110px 24px at 78% 82%); }
+  .flies i:nth-child(5) { animation-duration: 20s; animation-delay: -11s; offset-path: ellipse(160px 40px at 68% 68%); }
+
+  .island, .camp {
+    position: absolute;
+    border: 0;
+    background: transparent;
+    color: var(--parchment);
+    text-decoration: none;
+    padding: 0;
+  }
+  .island {
+    width: min(16vw, 180px);
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
+    --lit: 0.12;
+    --depth: 1;
+    --haze: 0;
+  }
+  .island .art {
+    position: relative;
+    display: block;
+    filter:
+      brightness(calc(0.42 + var(--depth) * 0.58))
+      blur(calc(var(--haze) * 1.4px));
+  }
+  .island .art img { width: 100%; height: auto; display: block; }
+  .island .art img.lit {
+    position: absolute;
+    inset: 0;
+    opacity: var(--lit);
+  }
+  .island .art::after {
+    content: "";
+    position: absolute;
+    left: 15%;
+    right: 15%;
+    bottom: 8%;
+    height: 40%;
+    background: radial-gradient(ellipse at center, rgba(255, 181, 71, 0.55), transparent 70%);
+    filter: blur(10px);
+    opacity: calc(var(--lit) * var(--depth));
+    pointer-events: none;
+    z-index: -1;
+  }
+  .island .name {
+    position: absolute;
+    left: 50%;
+    bottom: 4%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    white-space: nowrap;
+    color: var(--parchment);
+    text-shadow: 0 2px 16px #0b101c, 0 0 18px rgba(11, 16, 28, 0.9);
+    pointer-events: none;
+    transform: translate(-50%, 4px);
+    transition: transform 0.55s ease;
+  }
+  .island.named .name { transform: translate(-50%, 0); }
+  .island small {
+    display: block;
+    order: -1;
+    padding: 0.12rem 0.45rem 0.15rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--night) 72%, transparent);
+    font-family: var(--round);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--lantern);
+    opacity: 0.62;
+    transition: opacity 0.55s ease, background 0.55s ease;
+  }
+  .island.named small {
+    opacity: 1;
+    background: color-mix(in srgb, var(--night) 84%, transparent);
+  }
+  .island .place {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .island.named .place {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Far → near: smaller/darker peaks, then coast & forest, then plains & hollow by the camp. */
+  .peaks  { left: 64%; top: 12%; width: min(10vw, 118px); z-index: 1; --depth: 0.35; --haze: 1.6; --lit: 0.05; }
+  .coast  { left: 84%; top: 22%; width: min(13vw, 150px); z-index: 1; --depth: 0.5;  --haze: 1.1; --lit: 0.07; }
+  .forest { left: 48%; top: 30%; width: min(14vw, 164px); z-index: 2; --depth: 0.68; --haze: 0.55; --lit: 0.1; }
+  .plains { left: 55%; top: 52%; width: min(16vw, 188px); z-index: 3; --depth: 0.9;  --haze: 0.15; --lit: 0.18; }
+  .hollow { left: 86%; top: 56%; width: min(15vw, 176px); z-index: 3; --depth: 0.86; --haze: 0.25; --lit: 0.16; }
+
+  .camp {
+    left: 68%;
+    bottom: 0;
+    width: min(40vw, 460px);
+    transform: translateX(-50%);
+    z-index: 4;
+    pointer-events: none;
+  }
+  .camp::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    width: 46%;
+    height: 28%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 120, 48, 0.7), transparent 68%);
+    filter: blur(6px);
+    animation: pulse 3.2s ease-in-out infinite;
+  }
+  .camp .ground { width: 100%; height: auto; display: block; position: relative; }
+  .wren {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    width: 56%;
+    transform: translateX(-50%);
+    transform-origin: 50% 100%;
+    animation: breath 4.8s ease-in-out infinite;
+  }
+  .wren img { position: absolute; inset: 0; width: 100%; height: auto; }
+  .wren img:first-child { position: relative; }
+  .wren .flame { animation: flicker 2.6s ease-in-out infinite; }
+
+  .trail, .islands, .rules, .gate, footer { position: relative; z-index: 2; }
+  .trail { padding: 7rem 8vw 0; }
+  .surfaces {
+    max-width: 40rem;
+    margin: 0.5rem 0 0;
+    color: var(--mist);
+  }
+  .card {
+    display: grid;
+    grid-template-columns: minmax(14rem, 0.8fr) minmax(16rem, 1fr);
+    gap: 0.4rem 4rem;
+    max-width: 68rem;
+    margin: 0 0 4.2rem;
+    color: var(--mist);
+  }
+  .card { color: var(--parchment); }
+  .card p { margin: 0; color: var(--mist); }
+  .card em { font-family: var(--serif); font-style: italic; color: var(--lantern); }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.8rem, 3vw, 2.3rem);
+    letter-spacing: -0.03em;
+    margin: 0 0 0.45rem;
+  }
+  .kicker {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin: 0 0 0.35rem;
+  }
+
+  .islands {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem 1.25rem;
+    margin: 0;
+    padding: 1.5rem 6vw 0;
+  }
+  .islands .record {
+    grid-column: 1 / -1;
+    max-width: 18em;
+    margin: 0 0 0.4rem;
+    font-family: var(--serif);
+    font-size: clamp(1.45rem, 2vw, 1.85rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    color: var(--parchment);
+  }
+  .islands article { min-width: 0; }
+  .islands img { width: min(100%, 150px); height: auto; display: block; }
+  .islands h3 { font-family: var(--serif); font-weight: 500; margin: 0.55rem 0 0; font-size: 1.15rem; }
+  .islands p { margin: 0.3rem 0 0; color: var(--mist); font-size: 0.95rem; }
+
+  .rules { margin: 0; padding: 4.5rem 8vw 0; }
+  .rules ol {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem 2.5rem;
+    margin: 0;
+    padding: 0;
+  }
+  .rules li {
+    list-style: none;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(1.55rem, 2.2vw, 2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+  }
+  .rules li span {
+    display: block;
+    margin-top: 0.25rem;
+    font-family: var(--round);
+    font-size: 1rem;
+    letter-spacing: 0;
+    color: var(--mist);
+  }
+
+  .gate {
+    max-width: 28rem;
+    margin: 5.5rem 8vw 2rem;
+    padding: 0;
+    background: none;
+  }
+  form { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1.4rem; margin-top: 1.2rem; }
+  label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  input[type="email"] {
+    flex: 1 1 14rem;
+    min-height: 44px;
+    border: 0;
+    border-bottom: 1px solid rgba(174, 183, 204, 0.45);
+    border-radius: 0;
+    background: transparent;
+    color: var(--parchment);
+    padding: 0;
+    font: inherit;
+  }
+  button {
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 181, 71, 0.55);
+    border-radius: 0;
+    background: transparent;
+    color: var(--lantern);
+    font: inherit;
+    cursor: pointer;
+  }
+  .note, .kept { color: var(--mist); font-size: 0.9rem; }
+  .kept { color: var(--parchment); }
+  footer { margin: 0; padding: 0 8vw 3rem; color: var(--mist); font-size: 0.85rem; }
+
+  @keyframes drift { to { transform: translate3d(12vw, -6vh, 0); } }
+  @keyframes twinkle { 50% { opacity: 0.65; } }
+  @keyframes breath { 50% { transform: translateX(-50%) scale(1.018); } }
+  @keyframes flicker { 40% { opacity: 0.78; } 70% { opacity: 1; } }
+  @keyframes pulse { 50% { opacity: 0.55; transform: translate(-50%, -50%) scale(1.08); } }
+  @keyframes fly { to { offset-distance: 100%; } }
+
+  @media (max-width: 800px) {
+    .map { height: 104vw; min-height: 420px; overflow: visible; }
+    .legend { position: relative; top: auto; left: auto; padding: 1.2rem 1.25rem 0; }
+    .motto { position: relative; top: auto; left: auto; padding: 1.5rem 1.25rem 0; }
+    .motto p { font-size: 2.55rem; max-width: none; }
+    .peaks  { left: 28%; top: 14%; width: 26vw; }
+    .coast  { left: 78%; top: 18%; width: 30vw; }
+    .forest { left: 24%; top: 44%; width: 34vw; }
+    .plains { left: 36%; top: 72%; width: 40vw; }
+    .hollow { left: 82%; top: 58%; width: 36vw; }
+    .camp { left: 62%; bottom: -8%; width: 72vw; }
+    .trail { padding: 3.5rem 1.25rem 0; }
+    .card { grid-template-columns: 1fr; gap: 0.35rem; }
+    .islands { grid-template-columns: 1fr 1fr; padding: 2.5rem 1.25rem 0; }
+    .rules { padding: 3rem 1.25rem 0; }
+    .rules ol { grid-template-columns: 1fr; }
+    .gate { margin: 3rem 1.25rem 1.5rem; }
+    footer { padding: 0 1.25rem 2.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .stars, .wisps i, .wren, .wren .flame, .camp::before, .flies i { animation: none; }
+    .island { --lit: 1; --haze: 0; --depth: 1; }
+    .island .art { filter: none; }
+    .island .name,
+    .island small,
+    .island .place { transition: none; transform: none; opacity: 1; }
+    .island .name { transform: translate(-50%, 0); }
+    .island .place { transform: none; }
+    .card h2, .card p { filter: none; }
+    .lantern-light { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#trail">Skip to the trail</a>
+<div class="stars" aria-hidden="true"></div>
+<div class="wisps" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="lantern-light" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="legend">
+  <strong>Lanternway</strong>
+</header>
+
+<main>
+  <div class="motto">
+    <p class="eyebrow">An offscreen study RPG</p>
+    <p>Your focus sends<br>Wren into the fog.<span>Every completed study session opens the map, a chapter, and something new at camp. Leave the phone down. Come back for the story.</span></p>
+    <a class="walk" href="#trail">See a session</a>
+  </div>
+
+  <section class="map" aria-label="The world">
+    <div class="sky" aria-hidden="true"></div>
+    <div class="flies" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+
+    <a class="island peaks" href="#peaks">
+      <span class="art">
+        <img class="dark" src="art/region-peaks-dark.png" alt="">
+        <img class="lit" src="art/region-peaks.png" alt="">
+      </span>
+      <span class="name"><small>Math</small><span class="place">Ashen Peaks</span></span>
+    </a>
+    <a class="island forest" href="#forest">
+      <span class="art">
+        <img class="dark" src="art/region-forest-dark.png" alt="">
+        <img class="lit" src="art/region-forest.png" alt="">
+      </span>
+      <span class="name"><small>Science</small><span class="place">Lumen Forest</span></span>
+    </a>
+    <a class="island coast" href="#coast">
+      <span class="art">
+        <img class="dark" src="art/region-coast-dark.png" alt="">
+        <img class="lit" src="art/region-coast.png" alt="">
+      </span>
+      <span class="name"><small>Languages</small><span class="place">Whispering Coast</span></span>
+    </a>
+    <a class="island plains" href="#plains">
+      <span class="art">
+        <img class="dark" src="art/region-plains-dark.png" alt="">
+        <img class="lit" src="art/region-plains.png" alt="">
+      </span>
+      <span class="name"><small>Humanities</small><span class="place">Archive Plains</span></span>
+    </a>
+    <a class="island hollow" href="#hollow">
+      <span class="art">
+        <img class="dark" src="art/region-hollow-dark.png" alt="">
+        <img class="lit" src="art/region-hollow.png" alt="">
+      </span>
+      <span class="name"><small>Other</small><span class="place">Quiet Hollow</span></span>
+    </a>
+
+    <div class="camp" role="img" aria-label="Wren at the camp, lantern in hand">
+      <img class="ground" src="art/camp-base.png" alt="">
+      <span class="wren">
+        <img src="art/wren-idle.png" alt="">
+        <img src="art/cloak-patched.png" alt="">
+        <img class="flame" src="art/lantern-tin.png" alt="">
+      </span>
+    </div>
+  </section>
+
+  <section class="trail" id="trail">
+    <article class="card">
+      <div>
+        <p class="kicker">01</p>
+        <h2>Choose an island.</h2>
+      </div>
+      <p>Each subject is an island. Set 10 to 90 minutes and light the way.</p>
+    </article>
+    <article class="card">
+      <div>
+        <p class="kicker">02</p>
+        <h2>Wren goes into the fog.</h2>
+      </div>
+      <p>Distracting apps can stay dark through Screen Time, or you can just lock the phone. Leave for a real reason and the streak holds. Quit, and only this session goes unlit.</p>
+    </article>
+    <article class="card">
+      <div>
+        <p class="kicker">03</p>
+        <h2>Come back for a minute.</h2>
+      </div>
+      <p>You read the chapter this session opened. Thirty chapters open by studying, not by paying. About a minute. <em>Nothing else to do in the app.</em></p>
+    </article>
+    <p class="surfaces">The same hours show on the Lock Screen, the camp widget, and the week chart.</p>
+  </section>
+
+  <section class="islands" aria-label="Subjects">
+    <p class="record">Five islands. The one you study is the one that stays lit.</p>
+    <article id="peaks">
+      <img src="art/region-peaks.png" alt="">
+      <div>
+        <h3>Ashen Peaks</h3>
+        <p>Math. Every step up the mountain is carved with a number.</p>
+      </div>
+    </article>
+    <article id="coast">
+      <img src="art/region-coast.png" alt="">
+      <div>
+        <h3>Whispering Coast</h3>
+        <p>Languages. Shells on the beach whisper in other tongues.</p>
+      </div>
+    </article>
+    <article id="forest">
+      <img src="art/region-forest.png" alt="">
+      <div>
+        <h3>Lumen Forest</h3>
+        <p>Science. In the greenhouse, light needs time, not fire.</p>
+      </div>
+    </article>
+    <article id="plains">
+      <img src="art/region-plains.png" alt="">
+      <div>
+        <h3>Archive Plains</h3>
+        <p>Humanities. The archivist owl no longer remembers the books. He still listens.</p>
+      </div>
+    </article>
+    <article id="hollow">
+      <img src="art/region-hollow.png" alt="">
+      <div>
+        <h3>Quiet Hollow</h3>
+        <p>Everything else. Art, music, reading, or a project with no other island.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="rules" aria-label="The rules of the camp">
+    <ol>
+      <li>The past stays lit.<span>A broken session costs that session. Hours you already walked remain on the map.</span></li>
+      <li>Emergencies are free.<span>Leaving for a real reason never breaks the streak and never costs anything.</span></li>
+      <li>Focus cannot be bought.<span>No purchase grants minutes, fog, or a longer streak. Clothes for Wren are just clothes.</span></li>
+    </ol>
+  </section>
+
+  <section class="gate" id="gate" aria-labelledby="gate-title">
+    <p class="kicker">The camp gate</p>
+    <h2 id="gate-title">Not in the App Store yet.</h2>
+    <p>Leave an email if you want to hear when the first walk opens. This page does not save it.</p>
+    <form id="light">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+      <button type="submit">Light the way</button>
+    </form>
+    <p class="note" id="form-note">Nothing is sent.</p>
+  </section>
+</main>
+
+<footer>
+  <p>Nothing on this page is for sale. <a href="privacy/">Privacy</a> · <a href="support/">Support</a></p>
+</footer>
+
+<script>
+(function () {
+  const REACH = 170;
+  const REACH_SQ = REACH * REACH;
+  const FLOOR = 0.05;
+
+  const root = document.documentElement;
+  const map = document.querySelector(".map");
+  const camp = document.querySelector(".camp");
+  const form = document.getElementById("light");
+  const note = document.getElementById("form-note");
+  const spots = [...document.querySelectorAll(".map .island")].map((el) => ({ el, x: 0, y: 0, lit: -1, named: false }));
+  const campSpot = { x: 0, y: 0 };
+  const pointer = { x: 0, y: 0, seen: false };
+  const coarse = { x: 0, y: 0 };
+  const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const fine = window.matchMedia("(pointer: fine)");
+
+  let geometryDirty = true;
+  let frame = 0;
+  let running = false;
+  let hovered = null;
+  let focused = null;
+  let lastX = -1;
+  let lastY = -1;
+
+  function measure() {
+    for (const spot of spots) {
+      const box = spot.el.getBoundingClientRect();
+      spot.x = box.left + box.width * 0.5;
+      spot.y = box.top + box.height * 0.38;
+    }
+    if (camp) {
+      const box = camp.getBoundingClientRect();
+      campSpot.x = box.left + box.width * 0.5;
+      campSpot.y = box.top + box.height * 0.42;
+    }
+    geometryDirty = false;
+  }
+
+  function source() {
+    if (!fine.matches) {
+      coarse.x = window.innerWidth * 0.5;
+      coarse.y = window.innerHeight * 0.42;
+      return coarse;
+    }
+    return pointer.seen ? pointer : campSpot;
+  }
+
+  function writeLit(spot, value) {
+    const next = Math.round(Math.max(FLOOR, Math.min(1, value)) * 100) / 100;
+    const named = next >= 0.42;
+    if (spot.named !== named) {
+      spot.named = named;
+      spot.el.classList.toggle("named", named);
+    }
+    if (spot.lit === next) return;
+    spot.lit = next;
+    spot.el.style.setProperty("--lit", String(next));
+  }
+
+  function paint() {
+    frame = 0;
+    if (!running) return;
+    if (geometryDirty) measure();
+    const light = source();
+    const x = Math.round(light.x);
+    const y = Math.round(light.y);
+    if (x !== lastX) {
+      lastX = x;
+      root.style.setProperty("--lx", x + "px");
+    }
+    if (y !== lastY) {
+      lastY = y;
+      root.style.setProperty("--ly", y + "px");
+    }
+    const held = focused || hovered;
+    for (const spot of spots) {
+      if (spot.el === held) {
+        writeLit(spot, 1);
+        continue;
+      }
+      const dx = spot.x - light.x;
+      const dy = spot.y - light.y;
+      writeLit(spot, Math.exp(-(dx * dx + dy * dy) / REACH_SQ));
+    }
+  }
+
+  function requestPaint() {
+    if (!running || document.hidden || frame) return;
+    frame = requestAnimationFrame(paint);
+  }
+
+  function invalidate() {
+    geometryDirty = true;
+    requestPaint();
+  }
+
+  function onPointer(event) {
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+    pointer.seen = true;
+    requestPaint();
+  }
+
+  function islandFrom(node) {
+    return node && node.closest ? node.closest(".map .island") : null;
+  }
+
+  function onOver(event) {
+    const next = islandFrom(event.target);
+    if (next === hovered) return;
+    hovered = next;
+    requestPaint();
+  }
+
+  function onOut(event) {
+    if (!hovered) return;
+    if (hovered.contains(event.relatedTarget)) return;
+    hovered = null;
+    requestPaint();
+  }
+
+  function onFocusIn(event) {
+    const island = islandFrom(event.target);
+    focused = island && island.matches(":focus-visible") ? island : null;
+    requestPaint();
+  }
+
+  function onFocusOut(event) {
+    const next = islandFrom(event.relatedTarget);
+    focused = next && next.matches(":focus-visible") ? next : null;
+    requestPaint();
+  }
+
+  const resizeObserver = "ResizeObserver" in window && map
+    ? new ResizeObserver(invalidate)
+    : null;
+
+  function start() {
+    if (running || !map) return;
+    running = true;
+    window.addEventListener("pointermove", onPointer, { passive: true });
+    window.addEventListener("scroll", invalidate, { passive: true });
+    if (resizeObserver) resizeObserver.observe(map);
+    else window.addEventListener("resize", invalidate);
+    map.addEventListener("pointerover", onOver);
+    map.addEventListener("pointerout", onOut);
+    map.addEventListener("focusin", onFocusIn);
+    map.addEventListener("focusout", onFocusOut);
+    invalidate();
+  }
+
+  function stop() {
+    running = false;
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    window.removeEventListener("pointermove", onPointer);
+    window.removeEventListener("scroll", invalidate);
+    window.removeEventListener("resize", invalidate);
+    if (resizeObserver) resizeObserver.disconnect();
+    if (map) {
+      map.removeEventListener("pointerover", onOver);
+      map.removeEventListener("pointerout", onOut);
+      map.removeEventListener("focusin", onFocusIn);
+      map.removeEventListener("focusout", onFocusOut);
+    }
+    for (const spot of spots) {
+      spot.lit = -1;
+      spot.named = false;
+      spot.el.style.removeProperty("--lit");
+      spot.el.classList.remove("named");
+    }
+    lastX = -1;
+    lastY = -1;
+  }
+
+  function syncMotion() {
+    if (motion.matches) stop();
+    else start();
+  }
+
+  if (map) {
+    for (const img of map.querySelectorAll("img")) {
+      if (img.complete) continue;
+      img.addEventListener("load", invalidate, { once: true });
+      img.addEventListener("error", invalidate, { once: true });
+    }
+  }
+
+  motion.addEventListener("change", syncMotion);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      return;
+    }
+    invalidate();
+  });
+  window.addEventListener("pagehide", stop);
+  window.addEventListener("pageshow", syncMotion);
+
+  if (form && note) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      note.className = "kept";
+      note.textContent = "Nothing was sent. This page keeps no list.";
+    });
+  }
+
+  syncMotion();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+:root {
+  --night: #0b101c;
+  --dusk: #1b2236;
+  --lantern: #ffb547;
+  --mist: #aeb7cc;
+  --parchment: #f6efe2;
+  --serif: Fraunces, "Iowan Old Style", Palatino, Georgia, serif;
+  --round: Nunito, ui-rounded, "Avenir Next", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse 90% 60% at 70% 0%, #172135, transparent 55%),
+    var(--night);
+  color: var(--parchment);
+  font-family: var(--round);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+a { color: var(--lantern); }
+:focus-visible { outline: 2px solid var(--lantern); outline-offset: 3px; }
+
+.wrap {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 3rem;
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  font-family: var(--serif);
+}
+.brand {
+  color: var(--parchment);
+  text-decoration: none;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+}
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 1.1rem;
+  color: var(--mist);
+  font-family: var(--round);
+  font-size: 0.92rem;
+}
+.nav a { color: inherit; text-decoration: none; }
+.nav a[aria-current="page"] { color: var(--lantern); }
+
+h1 {
+  margin: 0 0 0.35rem;
+  font-family: var(--serif);
+  font-weight: 560;
+  font-size: clamp(2.1rem, 5vw, 2.8rem);
+  letter-spacing: -0.03em;
+}
+.meta, .lede {
+  color: var(--mist);
+  margin: 0 0 1.6rem;
+}
+h2 {
+  margin: 1.8rem 0 0.45rem;
+  font-family: var(--serif);
+  font-weight: 560;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+h3 {
+  margin: 1.2rem 0 0.3rem;
+  font-family: var(--serif);
+  font-weight: 560;
+  font-size: 1.1rem;
+}
+p { margin: 0 0 0.85rem; }
+.panel {
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  background: rgba(27, 34, 54, 0.72);
+  color: var(--mist);
+}
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1rem;
+  margin: 1.2rem 0 1.6rem;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.btn-primary { background: var(--lantern); color: var(--night); }
+.btn-ghost {
+  color: var(--parchment);
+  border-bottom: 1px solid rgba(246, 239, 226, 0.35);
+  border-radius: 0;
+  padding: 0;
+}
+.foot {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(174, 183, 204, 0.18);
+  color: var(--mist);
+  font-size: 0.85rem;
+}
+.foot-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
